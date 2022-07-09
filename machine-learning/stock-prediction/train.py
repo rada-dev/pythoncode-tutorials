@@ -3,6 +3,8 @@ from tensorflow.keras.layers import LSTM
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 import os
 import pandas as pd
+from itertools import product
+import multiprocessing
 from parameters import *
 
 
@@ -43,12 +45,21 @@ def train(stock, stock_data_filename, model_name, n_steps, scale, split_by_date,
                         verbose=1)
 
 
+def train_single(ticker, lookup_step):
+    tdf = ticker_data_filename(ticker)
+    mn = model_name_info(date_now, ticker, lookup_step, SHUFFLE, SCALE, SPLIT_BY_DATE, LOSS,
+                         OPTIMIZER, CELL, N_STEPS, N_LAYERS, UNITS, BIDIRECTIONAL)
+    train(ticker, tdf, mn, N_STEPS, scale=SCALE, split_by_date=SPLIT_BY_DATE,
+          shuffle=SHUFFLE, lookup_step=LOOKUP_STEP, test_size=TEST_SIZE,
+          feature_columns=FEATURE_COLUMNS)
+
+
+def main():
+    ticker_i_lookup_step = product(tickers, range(1, LOOKUP_STEP+1))
+    with multiprocessing.Pool(3) as pool:
+        pool.starmap(train_single, ticker_i_lookup_step)
+
+
 if __name__ == '__main__':
-    for i_lookup_step in range(1, LOOKUP_STEP+1):
-        for ticker in tickers:
-            tdf = ticker_data_filename(ticker)
-            mn = model_name_info(date_now, ticker, i_lookup_step, SHUFFLE, SCALE, SPLIT_BY_DATE, LOSS,
-                                 OPTIMIZER, CELL, N_STEPS, N_LAYERS, UNITS, BIDIRECTIONAL)
-            train(ticker, tdf, mn, N_STEPS, scale=SCALE, split_by_date=SPLIT_BY_DATE,
-                  shuffle=SHUFFLE, lookup_step=LOOKUP_STEP, test_size=TEST_SIZE,
-                  feature_columns=FEATURE_COLUMNS)
+    main()
+

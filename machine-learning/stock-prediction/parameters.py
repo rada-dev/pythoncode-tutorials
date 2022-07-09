@@ -26,9 +26,9 @@ N_LAYERS = 2
 # LSTM cell
 CELL = LSTM
 # 256 LSTM neurons
-UNITS = 128
-# 25% dropout
-DROPOUT = 0.25
+UNITS = 384
+# 40% dropout
+DROPOUT = 0.4
 # whether to use bidirectional RNNs
 BIDIRECTIONAL = False
 
@@ -58,6 +58,20 @@ def model_name_info(now, ticker, lookup_step, sh, sc, sbd, loss, opt, nn, n_step
 
 
 # Amazon stock market
-tickers = ["AMZN"]
+tickers = [
+    "AAPL",
+    "MSFT",
+    "GOOG",
+    "GOOGL",
+    "AMZN",
+    "TSLA",
+    "UNH",
+    "JNJ",
+    "META",
+    "V",
+    "TSM",
+    "NVDA",
+
+]
 # ticker_data_filenames = map(ticker_data_filename, tickers)
 # model_names = map(model_name_info, tickers)
