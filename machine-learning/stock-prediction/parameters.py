@@ -9,13 +9,10 @@ LOOKUP_STEP = 15
 
 # whether to scale feature columns & output price as well
 SCALE = True
-scale_str = f"sc-{int(SCALE)}"
 # whether to shuffle the dataset
 SHUFFLE = True
-shuffle_str = f"sh-{int(SHUFFLE)}"
 # whether to split the training/testing set by date
 SPLIT_BY_DATE = False
-split_by_date_str = f"sbd-{int(SPLIT_BY_DATE)}"
 # test ratio size, 0.2 is 20%
 TEST_SIZE = 0.2
 # features to use
@@ -29,9 +26,9 @@ N_LAYERS = 2
 # LSTM cell
 CELL = LSTM
 # 256 LSTM neurons
-UNITS = 256
-# 40% dropout
-DROPOUT = 0.4
+UNITS = 128
+# 25% dropout
+DROPOUT = 0.25
 # whether to use bidirectional RNNs
 BIDIRECTIONAL = False
 
@@ -45,11 +42,22 @@ OPTIMIZER = "adam"
 BATCH_SIZE = 64
 EPOCHS = 500
 
-# Amazon stock market
-ticker = "AMZN"
-ticker_data_filename = os.path.join("data", f"{ticker}_{date_now}.csv")
+
+# ticker data to save path
+def ticker_data_filename(ticker):
+    return os.path.join("data", f"{ticker}_{date_now}.csv")
+
+
 # model name to save, making it as unique as possible based on parameters
-model_name = f"{date_now}_{ticker}-{shuffle_str}-{scale_str}-{split_by_date_str}-\
-{LOSS}-{OPTIMIZER}-{CELL.__name__}-seq-{N_STEPS}-step-{LOOKUP_STEP}-layers-{N_LAYERS}-units-{UNITS}"
-if BIDIRECTIONAL:
-    model_name += "-b"
+def model_name_info(now, ticker, lookup_step, sh, sc, sbd, loss, opt, nn, n_steps, n_layers, units, bidir):
+    scale_str = f"sc-{int(sc)}"
+    shuffle_str = f"sh-{int(sh)}"
+    split_by_date_str = f"sbd-{int(sbd)}"
+    return f"{now}_{ticker}-step-{lookup_step:02d}-{shuffle_str}-{scale_str}-{split_by_date_str}" \
+           f"-{loss}-{opt}-{nn.__name__}-seq-{n_steps}-layers-{n_layers}-units-{units}"+bool(bidir)*"-b"
+
+
+# Amazon stock market
+tickers = ["AMZN"]
+# ticker_data_filenames = map(ticker_data_filename, tickers)
+# model_names = map(model_name_info, tickers)
